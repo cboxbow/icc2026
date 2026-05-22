@@ -1,26 +1,163 @@
 @import "tailwindcss";
 
+/* ─── Design Tokens ─────────────────────────────────────────── */
+@theme {
+  /* Backgrounds */
+  --color-bg-primary:   #070B14;
+  --color-bg-secondary: #0D1526;
+  --color-bg-tertiary:  #111D35;
+  --color-gray-dark:    #1A1F2E;
+  --color-gray-mid:     #444455;
+  --color-gray-light:   #AAAAAA;
+
+  /* Accent Blue */
+  --color-blue-vivid:  #007BFF;
+  --color-blue-bright: #1E90FF;
+  --color-blue-neon:   #66CCFF;
+  --color-blue-dark:   #005BEA;
+
+  /* Prestige */
+  --color-gold:     #FFD700;
+  --color-gold-dim: #B8960C;
+
+  /* Status */
+  --color-success: #00D084;
+  --color-warning: #FFB800;
+  --color-danger:  #FF3B5C;
+  --color-info:    #17C1E8;
+
+  /* Pool colors */
+  --color-pool-nord:   #3B82F6;
+  --color-pool-ouest:  #8B5CF6;
+  --color-pool-centre: #10B981;
+
+  /* Typography */
+  --font-display: "Arial Black", Impact, sans-serif;
+  --font-heading: Poppins, sans-serif;
+  --font-body:    Inter, sans-serif;
+  --font-mono:    "JetBrains Mono", monospace;
+}
+
+/* ─── CSS Custom Properties (for inline styles & gradients) ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary:    #070B14;
+  --bg-secondary:  #0D1526;
+  --bg-tertiary:   #111D35;
+  --blue-vivid:    #007BFF;
+  --blue-bright:   #1E90FF;
+  --blue-neon:     #66CCFF;
+  --blue-dark:     #005BEA;
+  --gold:          #FFD700;
+  --gold-dim:      #B8960C;
+  --success:       #00D084;
+  --warning:       #FFB800;
+  --danger:        #FF3B5C;
+  --info:          #17C1E8;
+  --pool-nord:     #3B82F6;
+  --pool-ouest:    #8B5CF6;
+  --pool-centre:   #10B981;
+  --white:         #FFFFFF;
+  --gray-light:    #AAAAAA;
+  --gray-mid:      #444455;
+  --gray-dark:     #1A1F2E;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base ───────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: radial-gradient(ellipse at 20% 50%, #0A1628 0%, #070B14 60%, #050810 100%);
+  color: #FFFFFF;
+  font-family: Inter, sans-serif;
+  min-height: 100vh;
+}
+
+/* ─── Utility classes (used in components) ───────────────────── */
+
+/* Cards */
+.card {
+  background: linear-gradient(135deg, #0D1526 0%, #111D35 100%);
+  border: 1px solid rgba(0, 123, 255, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(102, 204, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: rgba(0, 123, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #007BFF 0%, #66CCFF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glow effect */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.4), 0 0 60px rgba(0, 123, 255, 0.15);
+}
+
+/* Live badge */
+.badge-live {
+  background: #FF3B5C;
+  border-radius: 4px;
+  letter-spacing: 0.1em;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 6px;
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+/* Blue divider */
+.divider-blue {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #007BFF, transparent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0D1526;
+}
+::-webkit-scrollbar-thumb {
+  background: #444455;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #007BFF;
+}
+
+/* Animations */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #0D1526 25%, #111D35 50%, #0D1526 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
 }

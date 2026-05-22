@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ICC 2026 — Mauritius Padel League Interclub Championship
 
-## Getting Started
+Plateforme officielle du championnat interclub MPL 2026/2027.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router) · **React 19** · **TypeScript** (strict)
+- **Tailwind CSS v4** · design system dark navy complet
+- **Supabase** (PostgreSQL + Auth + Realtime + Storage)
+- **Zustand** · **React Query** · **Lucide React** · **Framer Motion**
+
+## Démarrage rapide
 
 ```bash
+npm install
+cp .env.local.example .env.local
+# → renseigner NEXT_PUBLIC_SUPABASE_URL et NEXT_PUBLIC_SUPABASE_ANON_KEY
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| URL | Description |
+|-----|-------------|
+| `/` | Accueil — hero, classements preview, countdown J+1 |
+| `/classements` | Classements complets (3 pools) |
+| `/calendrier` | Calendrier des 10 journées |
+| `/clubs` | Liste des 18 clubs |
+| `/clubs/[slug]` | Fiche club — stats, roster, résultats |
+| `/matchs` | Tous les matchs |
+| `/playoffs` | Bracket playoffs |
+| `/login` | Connexion (mot de passe ou magic link) |
+| `/club/dashboard` | Espace responsable de club |
+| `/admin/dashboard` | Espace admin MPL |
+| `/obs/match/[id]` | Overlay OBS (params: theme, show_sets, show_players) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## API endpoints
 
-## Learn More
+```
+GET /api/classements            → tous pools
+GET /api/classements/:pool      → NORD | OUEST | CENTRE_EST
+GET /api/clubs                  → 18 clubs
+GET /api/clubs/:slug            → fiche club
+GET /api/matchs/:id/score       → score live (format OBS)
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Setup Supabase
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Créer un projet sur supabase.com
+2. Copier Project URL + anon key → `.env.local`
+3. SQL Editor → exécuter `supabase/migrations/001_initial.sql`
+4. SQL Editor → exécuter `supabase/seed.sql`
+5. Créer le compte admin via **Auth → Users → Invite** (cbezandry@gmail.com)
+6. Exécuter dans SQL Editor :
+   ```sql
+   INSERT INTO user_profiles (id, role, nom, email)
+   VALUES ('<auth-uuid>', 'SUPER_ADMIN', 'Christian Bezandry', 'cbezandry@gmail.com');
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Déploiement Vercel
 
-## Deploy on Vercel
+```bash
+npx vercel
+# Variables : NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, RESEND_API_KEY
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Domaine cible : `icc2026.mu`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+MPL · Mauritius Padel League · cbezandry@gmail.com
