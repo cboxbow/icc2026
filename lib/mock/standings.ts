@@ -1,12 +1,22 @@
-import type { Classement, Club } from '../supabase/types';
+import type { Classement, Club, Division, Genre } from '../supabase/types';
 import { CLUBS } from '../constants/clubs';
 
-function mockStanding(clubId: string, pool: 'NORD' | 'OUEST' | 'CENTRE_EST', v: number, n: number, d: number, mg: number, mp: number, sp: number, sc: number, jp: number, jc: number, forme: string): Classement {
+function mockStanding(
+  clubId: string,
+  division: Division,
+  genre: Genre,
+  v: number, n: number, d: number,
+  mg: number, mp: number,
+  sp: number, sc: number,
+  jp: number, jc: number,
+  forme: string,
+): Classement {
   return {
     id: clubId,
-    pool,
     club_id: clubId,
     saison: '2026-2027',
+    division,
+    genre,
     journees_jouees: v + n + d,
     victoires: v,
     nuls: n,
@@ -24,29 +34,24 @@ function mockStanding(clubId: string, pool: 'NORD' | 'OUEST' | 'CENTRE_EST', v: 
   };
 }
 
-export const MOCK_STANDINGS_NORD: Classement[] = [
-  mockStanding('1', 'NORD', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('2', 'NORD', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('3', 'NORD', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('4', 'NORD', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('5', 'NORD', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('6', 'NORD', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+/** Empty D1 Men standings (season not started) */
+export const MOCK_STANDINGS_D1H: Classement[] = [
+  mockStanding('1', 1, 'H', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('2', 1, 'H', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('3', 1, 'H', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('4', 1, 'H', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('5', 1, 'H', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('6', 1, 'H', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('7', 1, 'H', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('8', 1, 'H', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 ];
 
-export const MOCK_STANDINGS_OUEST: Classement[] = [
-  mockStanding('7',  'OUEST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('8',  'OUEST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('9',  'OUEST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('10', 'OUEST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('11', 'OUEST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('12', 'OUEST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-];
-
-export const MOCK_STANDINGS_CENTRE: Classement[] = [
-  mockStanding('13', 'CENTRE_EST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('14', 'CENTRE_EST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('15', 'CENTRE_EST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('16', 'CENTRE_EST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('17', 'CENTRE_EST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-  mockStanding('18', 'CENTRE_EST', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+/** Empty D1 Women standings (season not started) */
+export const MOCK_STANDINGS_D1F: Classement[] = [
+  mockStanding('9',  1, 'F', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('10', 1, 'F', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('11', 1, 'F', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('12', 1, 'F', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('13', 1, 'F', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+  mockStanding('14', 1, 'F', 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 ];

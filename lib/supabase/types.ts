@@ -1,19 +1,41 @@
-export type Pool = 'NORD' | 'OUEST' | 'CENTRE_EST';
+// ─── Enums ────────────────────────────────────────────────────────────────────
+export type Division = 1 | 2 | 3 | 4;
+export type Genre = 'H' | 'F';
 export type Role = 'PUBLIC' | 'CLUB' | 'ADMIN' | 'SUPER_ADMIN';
-export type MatchCategorie = 'H' | 'F';
 export type MatchStatut = 'PLANIFIE' | 'EN_COURS' | 'TERMINE' | 'FORFAIT';
-export type RencontreStatut = 'PLANIFIEE' | 'EN_COURS' | 'TERMINEE' | 'REPORTEE' | 'FORFAIT';
-export type JourneeStatut = 'PLANIFIEE' | 'EN_COURS' | 'TERMINEE' | 'REPORTEE';
+export type RencontreStatut = 'PLANIFIE' | 'EN_COURS' | 'TERMINEE' | 'REPORTEE' | 'FORFAIT';
+export type JourneeStatut = 'PLANIFIE' | 'EN_COURS' | 'TERMINEE' | 'REPORTEE';
 export type SanctionType = 'AVERTISSEMENT' | 'SUSPENSION' | 'AMENDE' | 'FORFAIT';
 export type SponsorTier = 'TITLE' | 'GOLD' | 'SILVER' | 'OFFICIAL';
 export type Gagnant = 'DOM' | 'VIS' | 'NUL';
+export type JourneePhase = 'ALLER' | 'RETOUR';
 
+// ─── Division helpers ─────────────────────────────────────────────────────────
+export const DIVISION_LABELS: Record<Division, string> = {
+  1: 'Division 1',
+  2: 'Division 2',
+  3: 'Division 3',
+  4: 'Division 4',
+};
+export const DIVISION_COLORS: Record<Division, string> = {
+  1: '#FFD700', // gold — elite
+  2: '#007BFF', // blue — national
+  3: '#1E90FF', // bright blue — regional
+  4: '#66CCFF', // neon — development
+};
+export const GENRE_LABELS: Record<Genre, string> = {
+  H: 'Messieurs',
+  F: 'Dames',
+};
+
+// ─── Database types ───────────────────────────────────────────────────────────
 export interface Club {
   id: string;
   slug: string;
   nom: string;
-  pool: Pool;
-  ville: string;
+  division: Division | null;   // null until assigned June 2026
+  genre: Genre;
+  ville: string | null;
   courts: number;
   logo_url: string | null;
   couleur: string;
@@ -27,51 +49,55 @@ export interface Club {
 export interface Joueur {
   id: string;
   club_id: string;
-  prenom: string;
   nom: string;
-  categorie: MatchCategorie;
-  licence_no: string | null;
-  date_naiss: string | null;
-  niveau: string;
+  prenom: string;
+  date_naissance: string | null;
+  genre: Genre;
+  licence: string | null;
+  classement: number;
+  division_max: Division | null;
   actif: boolean;
   created_at: string;
+  // Joined
+  club?: Club;
 }
 
 export interface Journee {
   id: string;
   numero: number;
   date: string;
-  phase: 'ALLER' | 'RETOUR';
+  phase: JourneePhase;
   statut: JourneeStatut;
-  created_at: string;
 }
 
 export interface Rencontre {
   id: string;
   journee_id: string;
-  pool: Pool;
-  club_domicile: string;
-  club_visiteur: string;
+  club_dom_id: string;
+  club_vis_id: string;
+  division: Division;
+  genre: Genre;
+  lieu: string | null;
+  heure: string | null;
   statut: RencontreStatut;
   score_dom: number;
   score_vis: number;
+  pts_dom: number;
+  pts_vis: number;
+  valide: boolean;
+  valide_par: string | null;
   created_at: string;
   // Joined
-  club_domicile_data?: Club;
-  club_visiteur_data?: Club;
+  journee?: Journee;
+  club_dom?: Club;
+  club_vis?: Club;
   matchs?: Match[];
 }
 
 export interface Match {
   id: string;
   rencontre_id: string;
-  ordre: number;
-  categorie: MatchCategorie;
-  niveau: number;
-  heure_prevue: string | null;
-  heure_debut: string | null;
-  heure_fin: string | null;
-  statut: MatchStatut;
+  ordre: 1 | 2 | 3;
   j1_dom_id: string | null;
   j2_dom_id: string | null;
   j1_vis_id: string | null;
@@ -85,6 +111,10 @@ export interface Match {
   supertb_dom: number | null;
   supertb_vis: number | null;
   gagnant: Gagnant | null;
+  statut: MatchStatut;
+  heure_debut: string | null;
+  heure_fin: string | null;
+  live_actif: boolean;
   created_at: string;
   // Joined
   j1_dom?: Joueur;
@@ -95,9 +125,10 @@ export interface Match {
 
 export interface Classement {
   id: string;
-  pool: Pool;
   club_id: string;
   saison: string;
+  division: Division;
+  genre: Genre;
   journees_jouees: number;
   victoires: number;
   nuls: number;
@@ -126,13 +157,18 @@ export interface UserProfile {
 
 export interface Sanction {
   id: string;
-  joueur_id: string;
-  match_id: string;
+  joueur_id: string | null;
+  club_id: string | null;
+  rencontre_id: string | null;
   type: SanctionType;
   description: string | null;
   matchs_suspendus: number;
-  admin_id: string;
+  montant: number | null;
+  admin_id: string | null;
   created_at: string;
+  // Joined
+  joueur?: Joueur;
+  club?: Club;
 }
 
 export interface Sponsor {
@@ -145,18 +181,20 @@ export interface Sponsor {
   ordre: number;
 }
 
-export interface Database {
-  public: {
-    Tables: {
-      clubs: { Row: Club; Insert: Omit<Club, 'id' | 'created_at'>; Update: Partial<Club> };
-      joueurs: { Row: Joueur; Insert: Omit<Joueur, 'id' | 'created_at'>; Update: Partial<Joueur> };
-      journees: { Row: Journee; Insert: Omit<Journee, 'id' | 'created_at'>; Update: Partial<Journee> };
-      rencontres: { Row: Rencontre; Insert: Omit<Rencontre, 'id' | 'created_at'>; Update: Partial<Rencontre> };
-      matchs: { Row: Match; Insert: Omit<Match, 'id' | 'created_at'>; Update: Partial<Match> };
-      classements: { Row: Classement; Insert: Omit<Classement, 'id'>; Update: Partial<Classement> };
-      user_profiles: { Row: UserProfile; Insert: Omit<UserProfile, 'created_at'>; Update: Partial<UserProfile> };
-      sanctions: { Row: Sanction; Insert: Omit<Sanction, 'id' | 'created_at'>; Update: Partial<Sanction> };
-      sponsors: { Row: Sponsor; Insert: Omit<Sponsor, 'id'>; Update: Partial<Sponsor> };
-    };
-  };
+// ─── Division + Genre combos for standings tabs ───────────────────────────────
+export interface DivisionGenre {
+  division: Division;
+  genre: Genre;
+  label: string;
+  color: string;
 }
+
+export const DIVISIONS_GENRES: DivisionGenre[] = [
+  { division: 1, genre: 'H', label: 'D1 Messieurs', color: '#FFD700' },
+  { division: 2, genre: 'H', label: 'D2 Messieurs', color: '#007BFF' },
+  { division: 3, genre: 'H', label: 'D3 Messieurs', color: '#1E90FF' },
+  { division: 4, genre: 'H', label: 'D4 Messieurs', color: '#66CCFF' },
+  { division: 1, genre: 'F', label: 'D1 Dames',     color: '#FFD700' },
+  { division: 2, genre: 'F', label: 'D2 Dames',     color: '#007BFF' },
+  { division: 3, genre: 'F', label: 'D3 Dames',     color: '#1E90FF' },
+];

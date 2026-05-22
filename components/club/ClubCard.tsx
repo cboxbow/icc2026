@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Layers } from 'lucide-react';
 import type { Club } from '@/lib/supabase/types';
-import { PoolBadge } from '@/components/standings/PoolBadge';
+import { DivisionBadge } from '@/components/standings/DivisionBadge';
 
 interface ClubCardProps {
   club: Club;
@@ -28,21 +28,18 @@ export function ClubCard({ club, points, rang, victoires, defaites }: ClubCardPr
               club.nom.slice(0, 2).toUpperCase()
             )}
           </div>
-          <PoolBadge pool={club.pool} size="sm" />
+          <DivisionBadge division={club.division} genre={club.genre} showGenre size="sm" />
         </div>
 
         {/* Name */}
-        <h3
-          className="text-white font-bold mb-1 leading-tight"
-          style={{ fontFamily: 'Poppins, sans-serif', fontSize: 15 }}
-        >
+        <h3 className="text-white font-bold mb-1 leading-tight" style={{ fontFamily: 'Poppins, sans-serif', fontSize: 15 }}>
           {club.nom}
         </h3>
 
         {/* Location */}
         <div className="flex items-center gap-1 mb-4">
           <MapPin size={12} style={{ color: '#AAAAAA' }} />
-          <span style={{ color: '#AAAAAA', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>{club.ville}</span>
+          <span style={{ color: '#AAAAAA', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>{club.ville ?? '—'}</span>
           <span style={{ color: '#444455', fontSize: 12 }} className="ml-2">•</span>
           <Layers size={12} style={{ color: '#AAAAAA' }} className="ml-2" />
           <span style={{ color: '#AAAAAA', fontSize: 12, fontFamily: 'Inter, sans-serif' }}>{club.courts} courts</span>
@@ -50,10 +47,7 @@ export function ClubCard({ club, points, rang, victoires, defaites }: ClubCardPr
 
         {/* Stats */}
         {(points !== undefined || rang !== undefined) && (
-          <div
-            className="grid grid-cols-3 gap-2 pt-4 mt-auto"
-            style={{ borderTop: '1px solid rgba(0,123,255,0.1)' }}
-          >
+          <div className="grid grid-cols-3 gap-2 pt-4 mt-auto" style={{ borderTop: '1px solid rgba(0,123,255,0.1)' }}>
             {rang !== undefined && (
               <div className="text-center">
                 <div style={{ color: rang === 1 ? '#FFD700' : '#FFFFFF', fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, fontSize: 18 }}>

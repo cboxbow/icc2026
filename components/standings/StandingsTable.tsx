@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Classement } from '@/lib/supabase/types';
-import { sortStandings, diffMatchs, diffSets } from '@/lib/utils/standings';
+import { sortStandings, signedDiff } from '@/lib/utils/standings';
 import { RankBadge } from './RankBadge';
 
 interface StandingsTableProps {
@@ -105,10 +105,10 @@ export function StandingsTable({ standings, compact = false }: StandingsTablePro
                 {!compact && (
                   <>
                     <td className="py-3 px-2 text-center hidden lg:table-cell" style={{ color: '#AAAAAA', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>
-                      {diffMatchs(row.matchs_gagnes, row.matchs_perdus)}
+                      {signedDiff(row.matchs_gagnes, row.matchs_perdus)}
                     </td>
                     <td className="py-3 px-2 text-center hidden lg:table-cell" style={{ color: '#AAAAAA', fontFamily: 'JetBrains Mono, monospace', fontSize: 12 }}>
-                      {diffSets(row.sets_pour, row.sets_contre)}
+                      {signedDiff(row.sets_pour, row.sets_contre)}
                     </td>
                     <td className="py-3 px-2 hidden xl:table-cell">
                       <div className="flex items-center justify-center gap-0.5">

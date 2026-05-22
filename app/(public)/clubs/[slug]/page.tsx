@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { MapPin, Layers, Trophy, Calendar, Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
-import { PoolBadge } from '@/components/standings/PoolBadge';
+import { DivisionBadge } from '@/components/standings/DivisionBadge';
 import type { Club, Classement } from '@/lib/supabase/types';
 
 interface PageProps {
@@ -21,15 +21,17 @@ async function getClub(slug: string): Promise<{ club: Club; classement: Classeme
       .eq('slug', slug)
       .single();
     if (error || !clubRaw) return null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const club = clubRaw as any as Club;
+    const club = clubRaw as Club;
 
+    // Fetch the club's standing for this season (any division/genre)
     const { data: classementRaw } = await supabase
       .from('classements')
       .select('*')
       .eq('club_id', club.id)
       .eq('saison', '2026-2027')
-      .single();
+      .order('points', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     return { club, classement: classementRaw ? (classementRaw as unknown as Classement) : null };
   } catch {
@@ -38,13 +40,14 @@ async function getClub(slug: string): Promise<{ club: Club; classement: Classeme
 }
 
 async function getRank(club: Club, classement: Classement | null): Promise<number | null> {
-  if (!classement) return null;
+  if (!classement || !club.division) return null;
   try {
     const supabase = await createClient();
     const { data } = await supabase
       .from('classements')
       .select('points, matchs_gagnes, matchs_perdus, sets_pour, sets_contre')
-      .eq('pool', club.pool)
+      .eq('division', club.division)
+      .eq('genre', club.genre)
       .eq('saison', '2026-2027')
       .order('points', { ascending: false });
     if (!data) return null;
@@ -66,7 +69,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!result) return { title: 'Club introuvable' };
   return {
     title: result.club.nom,
-    description: `Fiche club ICC 2026 — ${result.club.nom} · ${result.club.ville}`,
+    description: `Fiche club ICC 2026 — ${result.club.nom} · ${result.club.ville ?? ''}`,
   };
 }
 
@@ -77,33 +80,26 @@ export default async function ClubPage({ params }: PageProps) {
 
   const { club, classement } = result;
   const rank = await getRank(club, classement);
-
   const forme = classement?.forme?.split('').filter(c => ['V', 'N', 'D'].includes(c)) ?? [];
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero */}
-      <div
-        className="rounded-2xl p-8 mb-8 relative overflow-hidden"
-        style={{
-          background: `linear-gradient(135deg, ${club.couleur}15 0%, rgba(13,21,38,0.9) 60%)`,
-          border: `1px solid ${club.couleur}30`,
-        }}
-      >
+      <div className="rounded-2xl p-8 mb-8 relative overflow-hidden"
+        style={{ background: `linear-gradient(135deg, ${club.couleur}15 0%, rgba(13,21,38,0.9) 60%)`, border: `1px solid ${club.couleur}30` }}>
         <div className="absolute inset-0 opacity-5"
           style={{ background: `radial-gradient(ellipse at 80% 50%, ${club.couleur} 0%, transparent 70%)` }} />
 
         <div className="relative flex flex-col sm:flex-row items-start gap-6">
           {/* Logo */}
-          <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-black text-2xl flex-shrink-0 overflow-hidden"
+          <div className="w-20 h-20 rounded-2xl flex items-center justify-center text-white font-black text-2xl flex-shrink-0 overflow-hidden"
             style={{
               background: club.logo_url ? 'rgba(255,255,255,0.05)' : `linear-gradient(135deg, ${club.couleur} 0%, ${club.couleur}99 100%)`,
               boxShadow: `0 0 30px ${club.couleur}40`,
-            }}
-          >
+            }}>
             {club.logo_url ? (
-              <Image src={club.logo_url} alt={club.nom} width={80} height={80} style={{ objectFit: 'contain', width: '100%', height: '100%', padding: 8 }} />
+              <Image src={club.logo_url} alt={club.nom} width={80} height={80}
+                style={{ objectFit: 'contain', width: '100%', height: '100%', padding: 8 }} />
             ) : (
               club.nom.slice(0, 2).toUpperCase()
             )}
@@ -112,17 +108,19 @@ export default async function ClubPage({ params }: PageProps) {
           {/* Info */}
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-3 mb-2">
-              <PoolBadge pool={club.pool} size="md" />
+              <DivisionBadge division={club.division} genre={club.genre} showGenre size="md" />
             </div>
             <h1 className="text-white font-black mb-2"
               style={{ fontFamily: '"Arial Black", Impact, sans-serif', fontSize: 'clamp(24px, 4vw, 36px)' }}>
               {club.nom}
             </h1>
             <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-1.5" style={{ color: '#AAAAAA', fontSize: 13 }}>
-                <MapPin size={14} style={{ color: club.couleur }} />
-                {club.ville}
-              </div>
+              {club.ville && (
+                <div className="flex items-center gap-1.5" style={{ color: '#AAAAAA', fontSize: 13 }}>
+                  <MapPin size={14} style={{ color: club.couleur }} />
+                  {club.ville}
+                </div>
+              )}
               <div className="flex items-center gap-1.5" style={{ color: '#AAAAAA', fontSize: 13 }}>
                 <Layers size={14} style={{ color: club.couleur }} />
                 {club.courts} courts padel
@@ -140,7 +138,7 @@ export default async function ClubPage({ params }: PageProps) {
               {rank ? `#${rank}` : '—'}
             </div>
             <div style={{ color: '#AAAAAA', fontSize: 11, fontFamily: 'Poppins, sans-serif', marginTop: 4 }}>
-              {club.pool === 'NORD' ? 'Pool Nord' : club.pool === 'OUEST' ? 'Pool Ouest' : 'Pool Centre/Est'}
+              {club.division ? `Division ${club.division}` : 'Classement'}
             </div>
           </div>
         </div>

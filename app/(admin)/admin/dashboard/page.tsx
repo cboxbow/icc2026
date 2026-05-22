@@ -157,7 +157,7 @@ export default function AdminDashboard() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid rgba(0,123,255,0.08)' }}>
-                {['Club', 'Pool', 'Ville', 'Courts', 'Statut'].map(h => (
+                {['Club', 'Division', 'Ville', 'Courts', 'Statut'].map(h => (
                   <th key={h} className="text-left px-6 py-3" style={{ color: '#AAAAAA', fontSize: 11, fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>{h}</th>
                 ))}
               </tr>
@@ -182,13 +182,9 @@ export default function AdminDashboard() {
                   <td className="px-6 py-3">
                     <span
                       className="text-xs font-semibold px-2 py-0.5 rounded-full"
-                      style={{
-                        background: club.pool === 'NORD' ? 'rgba(59,130,246,0.15)' : club.pool === 'OUEST' ? 'rgba(139,92,246,0.15)' : 'rgba(16,185,129,0.15)',
-                        color: club.pool === 'NORD' ? '#3B82F6' : club.pool === 'OUEST' ? '#8B5CF6' : '#10B981',
-                        fontFamily: 'Poppins, sans-serif',
-                      }}
+                      style={{ background: 'rgba(170,170,170,0.12)', color: '#AAAAAA', fontFamily: 'Poppins, sans-serif' }}
                     >
-                      {club.pool}
+                      TBD juin 2026
                     </span>
                   </td>
                   <td className="px-6 py-3" style={{ color: '#AAAAAA', fontFamily: 'Inter, sans-serif', fontSize: 13 }}>{club.ville}</td>

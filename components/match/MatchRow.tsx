@@ -19,7 +19,7 @@ function SetScore({ dom, vis }: { dom: number | null; vis: number | null }) {
 }
 
 export function MatchRow({ match, showTime = false }: MatchRowProps) {
-  const label = `${match.categorie}${match.niveau}`;
+  const label = `Double ${match.ordre}`;
   const isLive = match.statut === 'EN_COURS';
   const isDone = match.statut === 'TERMINE';
 
@@ -38,13 +38,13 @@ export function MatchRow({ match, showTime = false }: MatchRowProps) {
         border: isLive ? '1px solid rgba(0,123,255,0.25)' : '1px solid transparent',
       }}
     >
-      {/* Label */}
-      <div className="flex-shrink-0 w-10 text-center">
+      {/* Label: Double 1 / 2 / 3 */}
+      <div className="flex-shrink-0 w-14 text-center">
         <span
           className="inline-flex items-center justify-center rounded font-bold text-xs"
           style={{
-            color: match.categorie === 'H' ? '#007BFF' : '#8B5CF6',
-            background: match.categorie === 'H' ? 'rgba(0,123,255,0.15)' : 'rgba(139,92,246,0.15)',
+            color: '#007BFF',
+            background: 'rgba(0,123,255,0.15)',
             padding: '2px 5px',
             fontFamily: 'Poppins, sans-serif',
           }}
@@ -80,11 +80,13 @@ export function MatchRow({ match, showTime = false }: MatchRowProps) {
           {isDone || isLive ? (
             <div className="flex items-center gap-2 flex-shrink-0">
               <SetScore dom={match.set1_dom} vis={match.set1_vis} />
-              {(match.set2_dom !== null) && <SetScore dom={match.set2_dom} vis={match.set2_vis} />}
-              {(match.set3_dom !== null) && <SetScore dom={match.set3_dom} vis={match.set3_vis} />}
+              {match.set2_dom !== null && <SetScore dom={match.set2_dom} vis={match.set2_vis} />}
+              {match.set3_dom !== null && <SetScore dom={match.set3_dom} vis={match.set3_vis} />}
             </div>
           ) : (
-            <span style={{ color: '#444455', fontSize: 12 }}>{showTime && match.heure_prevue ? match.heure_prevue : 'vs'}</span>
+            <span style={{ color: '#444455', fontSize: 12 }}>
+              {showTime && match.heure_debut ? new Date(match.heure_debut).toLocaleTimeString('fr-MU', { hour: '2-digit', minute: '2-digit' }) : 'vs'}
+            </span>
           )}
 
           {/* VIS */}
@@ -109,11 +111,7 @@ export function MatchRow({ match, showTime = false }: MatchRowProps) {
         <div className="flex-shrink-0">
           <span
             className="w-6 h-6 rounded-full flex items-center justify-center text-white font-bold"
-            style={{
-              background: '#00D084',
-              fontSize: 10,
-              display: 'inline-flex',
-            }}
+            style={{ background: '#00D084', fontSize: 10, display: 'inline-flex' }}
           >
             ✓
           </span>
